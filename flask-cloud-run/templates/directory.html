@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ directory }}</title>
+    <style>
+        /* CSS for grid layout */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Responsive columns */
+            gap: 10px; /* Space between images */
+        }
+        
+        .grid-item {
+            overflow: hidden;
+            border: 1px solid #ccc; /* Optional border */
+            border-radius: 5px; /* Optional rounded corners */
+            padding: 5px; /* Optional padding */
+            cursor: pointer; /* Indicate clickable item */
+        }
+
+        .grid-item img {
+            width: 100%; /* Makes the image responsive */
+            height: auto; /* Maintains aspect ratio */
+            display: block; /* Removes bottom spacing */
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0, 0, 0, 0.8); /* Black w/ opacity */
+        }
+
+        .modal-content {
+            margin: auto;
+            display: block;
+            width: 80%; /* Width of the modal image */
+            height: auto; /* Maintain aspect ratio */
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #fff;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* CSS for grid layout */
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Responsive columns */
+        gap: 10px; /* Space between images */
+    }
+
+    .grid-item {
+        overflow: hidden;
+        border: 1px solid #ccc; /* Optional border */
+        border-radius: 5px; /* Optional rounded corners */
+        padding: 5px; /* Optional padding */
+        cursor: pointer; /* Indicate clickable item */
+        text-align: center; /* Center align the text */
+    }
+
+    .grid-item img {
+        width: 100%; /* Makes the image responsive */
+        height: auto; /* Maintains aspect ratio */
+        display: block; /* Removes bottom spacing */
+    }
+
+    /* Centering label */
+    .grid-item p {
+        margin: 0; /* Remove default margin */
+        text-align: center; /* Center the label text */
+    }
+
+    /* Modal styles */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgba(0, 0, 0, 0.8); /* Black w/ opacity */
+    }
+
+    .modal-content {
+        margin: auto;
+        display: block;
+        width: 80%; /* Width of the modal image */
+        height: auto; /* Maintain aspect ratio */
+    }
+
+    .close {
+        position: absolute;
+        top: 15px;
+        right: 35px;
+        color: #fff;
+        font-size: 40px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    </style>
+</head>
+<body>
+    <h1>Directory: {{ directory }}</h1>
+
+    <!-- Display Subdirectories -->
+    <h2>Subdirectories</h2>
+    <ul>
+        {% for subdirectory in subdirectories %}
+        <li><a href="{{ url_for('view_directory', directory=directory + '/' + subdirectory) }}">{{ subdirectory }}</a></li>
+        {% endfor %}
+    </ul>
+
+    <!-- Display Images -->
+    <h2>Images</h2>
+    <div class="grid">
+        {% for image in images %}
+        <div class="grid-item" onclick="openModal('{{ image }}')">
+            <!-- Correct URL format to display image from GCS -->
+            <img src="{{ image }}" alt="{{ image }}" loading="lazy" />
+            <p>{{ image.split('/')[-1].split('?')[0].rsplit('.', 1)[0].replace('%20', ' ') }}</p> <!-- Transform label text -->
+        </div>
+        {% endfor %}
+    </div>
+
+
+    <!-- Modal -->
+    <div id="myModal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="modalImg">
+    </div>
+
+    <script>
+        // Open modal function
+        function openModal(imageSrc) {
+            var modal = document.getElementById("myModal");
+            var modalImg = document.getElementById("modalImg");
+            modal.style.display = "block"; // Show the modal
+            modalImg.src = imageSrc; // Set the image source for modal
+        }
+
+        // Close modal function
+        function closeModal() {
+            var modal = document.getElementById("myModal");
+            modal.style.display = "none"; // Hide the modal
+        }
+
+        // Close modal when clicking outside of the image
+        window.onclick = function(event) {
+            var modal = document.getElementById("myModal");
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
