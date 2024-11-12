@@ -17,7 +17,7 @@ RUN npm run build
 # Step 6: Use a lightweight web server to serve the app (e.g., nginx)
 FROM nginx:alpine
 COPY --from=build /app/dist /usr/share/nginx/html
-
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Expose port 80
 EXPOSE 80
 
