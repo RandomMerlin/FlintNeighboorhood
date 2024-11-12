@@ -1,26 +1,25 @@
-# Stage 1: Build the Vite app
-FROM node:18-slim AS builder
+# Step 1: Use a Node.js image as the base
+FROM node:18 AS build
 
-# Set the working directory
+# Step 2: Set the working directory in the container
 WORKDIR /app
 
-# Copy the package files and install dependencies
+# Step 3: Copy package.json and package-lock.json, then install dependencies
 COPY package*.json ./
 RUN npm install
 
-# Copy the rest of the app files and build the app
+# Step 4: Copy the rest of the application code
 COPY . .
+
+# Step 5: Build the Vite React app
 RUN npm run build
 
-# Stage 2: Serve the app with a lightweight server
-FROM node:18-slim
+# Step 6: Use a lightweight web server to serve the app (e.g., nginx)
+FROM nginx:alpine
+COPY --from=build /app/dist /usr/share/nginx/html
 
-# Install the serve package globally
-RUN npm install -g serve
-
-# Copy the built files from the previous stage
-COPY --from=builder /app/dist /app
-
-# Set the default command to serve the app on port 8080
+# Expose port 80
 EXPOSE 8080
-CMD ["serve", "-s", "/app", "-l", "8080"]
+
+# Start nginx server
+CMD ["nginx", "-g", "daemon off;"]
