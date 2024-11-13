@@ -1,25 +1,36 @@
-# Step 1: Use a Node.js image as the base
+# Step 1: Use Node.js image for building the app
 FROM node:18 AS build
 
-# Step 2: Set the working directory in the container
+# Set the working directory in the container
 WORKDIR /app
 
-# Step 3: Copy package.json and package-lock.json, then install dependencies
+# Copy package.json and package-lock.json, and install dependencies
 COPY package*.json ./
 RUN npm install
 
-# Step 4: Copy the rest of the application code
+# Copy the application source code
 COPY . .
 
-# Step 5: Build the Vite React app
+# Build the Vite React app
 RUN npm run build
 
-# Step 6: Use a lightweight web server to serve the app (e.g., nginx)
-FROM nginx:alpine
-COPY --from=build /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-# Expose port 80
-EXPOSE 80
+# Step 2: Serve the app with Node.js
+FROM node:18-alpine
 
-# Start nginx server
-CMD ["nginx", "-g", "daemon off;"]
+# Set the working directory
+WORKDIR /app
+
+# Copy the build output from the previous stage
+COPY --from=build /app/dist /app/dist
+
+# Install an HTTP server for serving static files
+RUN npm install -g serve
+
+# Set environment variables for Cloud Run
+ENV PORT=8080
+
+# Expose the Cloud Run port
+EXPOSE 8080
+
+# Command to serve the static files
+CMD ["serve", "-s", "dist", "-l", "8080"]
